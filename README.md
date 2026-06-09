@@ -14,7 +14,9 @@
 | 3 | [Prompt Chaining](#3-prompt-chaining) | ✅ Completed | Multi-step Chains, Sequential Flows | 🟡 Intermediate |
 | 4 | Batsman Workflow | ✅ Completed | Parallel Workflows, Metric Merge | 🟡 Intermediate |
 | 5 | UPSC Essay Workflow | ✅ Completed | Structured Output, Evaluation | 🟡 Intermediate |
-| 6 | *Coming Soon* | ⏳ Planned | Memory & State Persistence | 🟠 Advanced |
+| 6 | Review Reply Workflow | ✅ Completed | Conditional Routing, Sentiment Analysis | 🟡 Intermediate |
+| 7 | X Post Generation | ✅ Completed | Iterative Workflow, Evaluation Loop | 🟡 Intermediate |
+| 8 | *Coming Soon* | ⏳ Planned | Memory & State Persistence | 🟠 Advanced |
 
 ---
 
@@ -41,7 +43,7 @@ START → validate_input → calculate_bmi → format_result → END
 
 Example: `1_bmi_workflow.ipynb`
 
-### Parallel Workflow
+### ⚡ Parallel Workflow
 
 A parallel workflow executes multiple independent branches from the same starting state and merges results later.
 
@@ -64,6 +66,84 @@ START ───────▶ │ branch B  │
 - Best when several tasks can run independently.
 - Use it when branches do not require each other’s output before execution.
 - Example: `4_batsman_workflow.ipynb` uses parallel branches to compute multiple metrics and combine them in one summary.
+
+### 🧭 Conditional Workflow
+
+A conditional workflow uses logic to decide which path to take next based on the current state.
+
+```
+START
+  │
+  ▼
+find_sentiment
+  │
+  ├── positive ───────▶ positive_response ─▶ END
+  │
+  └── negative ───────▶ run_diagnosis ─▶ negative_response ─▶ END
+```
+
+✅ What it is:
+- A branch-based workflow that chooses the next step dynamically.
+- It is useful when one decision changes the rest of the flow.
+
+✅ Why it is needed:
+- It makes your workflow smarter and more adaptive.
+- It avoids sending every input through the same path.
+- It is ideal for customer support, review handling, and triage systems.
+
+✅ Real use cases:
+- Replying to positive or negative customer reviews
+- Routing support tickets to different response paths
+- Classifying leads before sending them to sales or follow-up
+
+✅ Reference example:
+- `7_review_reply_workfllow.ipynb` shows this pattern by detecting review sentiment and choosing between a thank-you reply or a diagnosis flow.
+
+### 🔁 Iterative Workflow
+
+An iterative workflow is a loop-based graph where the model generates an output, evaluates it, and improves it until the result is good enough or the max number of attempts is reached.
+
+```
+START
+  │
+  ▼
+generate_tweet
+  │
+  ▼
+evaluate_tweet
+  │
+  ├── approved ───────────────▶ END
+  │
+  └── needs_improvement ─────▶ optimize_tweet ─▶ evaluate_tweet
+                                   ▲                 |
+                                   └────── max_iter? ─┘
+```
+
+✅ What it is:
+- A self-correction loop built with LangGraph state and conditional routing.
+- It uses the current state to decide whether to stop or revise the output.
+
+✅ Why it is needed:
+- It improves quality with feedback instead of relying on one-shot generation.
+- It is useful when outputs must be judged for tone, accuracy, clarity, or brand fit.
+- It prevents weak or off-topic results from being accepted automatically.
+
+✅ Real use cases:
+- Social media post generation and improvement
+- Marketing copy, ad headlines, and campaign captions
+- Email drafting with review and rewrite cycles
+- Essay or report refinement using evaluation feedback
+
+✅ How it works:
+1. The workflow starts with a topic and iteration count.
+2. The `generate` node creates the first draft.
+3. The `evaluate` node checks quality, relevance, originality, and engagement.
+4. If the result is approved, the loop ends.
+5. If it needs improvement, the `optimize` node rewrites the draft and sends it back for another evaluation.
+6. The loop continues until the output is approved or the maximum iteration limit is reached.
+
+✅ Reference example:
+- `8_X_Post_Generation.ipynb` demonstrates this pattern with an X/Twitter post generation workflow that evaluates and improves tweets iteratively.
 
 ---
 
@@ -210,8 +290,10 @@ print("✅ LangGraph and LangChain installed successfully!")
 - **`3_prompt_chainging.ipynb`**: Prompt chaining with multi-step text workflows.
 - **`4_batsman_workflow.ipynb`**: Parallel workflow example; compute branches independently and merge results.
 - **`5_UPSC_essay_workflow.ipynb`**: Essay evaluation pipeline with structured output and workflow orchestration.
+- **`7_review_reply_workfllow.ipynb`**: Conditional workflow for sentiment-based review handling and response routing.
+- **`8_X_Post_Generation.ipynb`**: Iterative workflow for generating, evaluating, and improving X/Twitter posts with conditional routing.
 
-The notebook files contain the full code examples, while this README highlights the main patterns and the new parallel workflow design.
+The notebook files contain the full code examples, while this README highlights the main patterns, including the new iterative workflow design.
 
 ---
 
