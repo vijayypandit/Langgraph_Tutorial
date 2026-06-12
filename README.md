@@ -18,6 +18,52 @@ This repository contains a short series of hands-on notebooks that demonstrate L
 7. [7_review_reply_workfllow.ipynb](7_review_reply_workfllow.ipynb) — 💬 Conditional reply workflow (Intermediate)
 8. [8_X_Post_Generation.ipynb](8_X_Post_Generation.ipynb) — 🐦 Iterative post generation (Intermediate)
 9. [9_basic_chatbot.ipynb](9_basic_chatbot.ipynb) — 🤖 Basic chatbot (In progress)
+10. [10_persistance.ipynb](10_persistance.ipynb) — 🧠 Persistence + checkpoint memory (Intermediate)
+
+## 📘 Persistence Tutorial (Notebook 10)
+
+**File:** [`10_persistance.ipynb`](10_persistance.ipynb)
+
+#### 📝 What it teaches
+- How to save and inspect workflow state using LangGraph checkpointing
+- How `InMemorySaver` records short-term memory snapshots
+- How `thread_id` isolates separate workflow executions
+
+#### 🔧 Core concepts
+1. `InMemorySaver()` is used as a checkpointer when compiling the graph.
+2. `workflow.invoke(..., config={'configurable': {'thread_id': 1}})` runs the workflow and stores state under `thread_id = 1`.
+3. `workflow.get_state(config)` returns the latest persisted state snapshot.
+4. `workflow.get_state_history(config)` returns the timeline of saved snapshots for that session.
+
+#### 💡 Why it matters
+- Persists intermediate workflow state across nodes
+- Gives visibility into the "short-term memory" of a graph execution
+- Enables multiple concurrent sessions with separate state histories
+
+#### 🧠 Short-term memory flow
+
+```
+[Input data] -> workflow.invoke(...)
+      |
+      v
+[StateGraph execution]
+      |
+      +--> generate_joke node
+      |         |
+      |         +--> LLM call
+      |         +--> save checkpoint snapshot
+      |
+      +--> generate_explanation node
+                |
+                +--> LLM call
+                +--> save checkpoint snapshot
+      |
+      v
+[InMemorySaver checkpoints]
+      |
+      +--> thread_id=1: current state + history
+      +--> thread_id=2: separate state + history
+```
 
 ## 🗂️ Other files
 
@@ -29,7 +75,8 @@ This repository contains a short series of hands-on notebooks that demonstrate L
 ## 📌 Project Status
 
 - Notebooks 1–8: ✅ complete and ready to open.
-- Notebook 9 (`9_basic_chatbot.ipynb`): 🔧 in development — building a basic chatbot that ties together earlier patterns. Expect iterative improvements and comments inside the notebook.
+- Notebook 9 (`9_basic_chatbot.ipynb`): 🔧 in development — building a basic chatbot that ties together earlier patterns.
+- Notebook 10 (`10_persistance.ipynb`): ✅ complete — demonstrates checkpoint persistence and short-term workflow memory.
 
 ## ⚡ Quick Start
 
